@@ -86,3 +86,265 @@ after adding these for the first time.
 (require 'diminish)
 (require 'bind-key)
 #+END_SRC
+
+*** Customization
+
+Change some of emacs’s defaults because they suck:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq inhibit-startup-message t ; disable start screen
+      font-lock-maximum-decoration t) ; lots of color
+(setq use-dialog-box nil) ; don't use popup boxes, just make the minibuffer ask
+#+END_SRC
+
+Ignore file case when trying to find stuff:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq read-file-name-completion-ignore-case t)
+#+END_SRC
+
+Delete my files by moving them to the trash. I’m human and occasionally delete things that I actually want later:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq delete-by-moving-to-trash t)
+#+END_SRC
+
+Set up a cache folder in my .emacs.d folder so that it’s not quite as crowded
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defvar my/emacs-cache (concat user-emacs-directory ".cache/")
+  "Folder to store cache files in. Should end with a forward slash.")
+#+END_SRC
+
+Save a few misc files in the .cache directory
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq custom-file (concat my/emacs-cache "customize.el"))
+(setq bookmark-default-file (concat my/emacs-cache "bookmarks"))
+
+(setq recentf-save-file (concat my/emacs-cache "recentf"))
+(setq nsm-settings-file (concat my/emacs-cache "network-security.data"))
+#+END_SRC
+
+No blinking
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(blink-cursor-mode -1)
+#+END_SRC
+
+No beeping, no visual bell
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq visible-bell nil)
+(setq ring-bell-function 'ignore)
+#+END_SRC
+
+Show line numbers in prog-mode
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(add-hook 'prog-mode-hook 'linum-mode)
+#+END_SRC
+
+Delete trailing whitespaces on save
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+**** Scrolling
+
+Emacs has some awful scrolling by default. This gets rid of that.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
+(setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ; scroll window under mouse
+(setq scroll-step 1) ; keyboard scroll one line at a time
+(setq scroll-preserve-screen-position t)
+(setq scroll-conservatively 101)
+(setq view-read-only t) ; open read only buffers in view-mode
+;; the defaults C-v and M-v scroll a full page, which is too much.
+;; rebind to a half page:
+(use-package view
+  :bind
+  ("C-v" . View-scroll-half-page-forward)
+  ("M-v" . View-scroll-half-page-backward))
+#+END_SRC
+
+This provides a visual cue whenever Emacs scrolls so it’s easier to keep my place:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package on-screen
+  :ensure t
+  :config
+  (on-screen-global-mode))
+#+END_SRC
+
+**** Fonts
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(set-default-font "Monaco 14")
+#+END_SRC
+
+
+** Packages
+
+*** Magit
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package magit ; for git
+  :pin melpa-stable
+  :bind
+  ("C-x g" . magit-status)
+  :config
+  (setq magit-diff-refine-hunk 'all) ; get highlighted word diffs
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
+#+END_SRC
+
+*** Leuven color theme
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package leuven-theme
+  :config
+  (progn (load-theme 'leuven t)))
+#+END_SRC
+
+*** Ivy
+
+https://sam217pa.github.io/2016/08/30/how-to-make-your-own-spacemacs/
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package ivy
+  :diminish (ivy-mode . "") ; does not display ivy in the modeline
+  :init (ivy-mode 1)        ; enable ivy globally at startup
+  :bind
+  ("C-c C-r" . ivy-resume)
+  ("C-s" . swiper)
+  (:map ivy-mode-map  ; bind in the ivy buffer
+        ("C-'" . ivy-avy)) ; C-' to ivy-avy
+  :config
+  (setq ivy-use-virtual-buffers t)   ; extend searching to bookmarks and …
+  (setq ivy-height 20)               ; set height of the ivy window
+  (setq ivy-count-format "(%d/%d) ") ; count format, from the ivy help page
+  )
+#+END_SRC
+
+*** Avy
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package avy
+  :ensure t
+  :bind
+  ("C-M-g" . avy-goto-char-timer))
+#+END_SRC
+
+*** Counsel
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package counsel
+  :bind*                           ; load counsel when pressed
+  (("M-x"     . counsel-M-x)       ; M-x use counsel
+   ("C-x C-f" . counsel-find-file) ; C-x C-f use counsel-find-file
+   ("C-x C-r" . counsel-recentf)   ; search recently edited files
+   ("C-c g"   . counsel-git)       ; search for files in git repo
+   ("C-c j"   . counsel-git-grep)  ; search for regexp in git repo
+   ("C-c k"   . counsel-ag)        ; search for regexp in git repo using ag
+   ("C-c l"   . counsel-locate))   ; search for files or else using locate
+  )
+#+END_SRC
+
+*** Smex
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package smex
+  :config (smex-initialize)  :config (smex-initialize)
+  :bind ("M-x" . smex)
+  ("M-X" . smex-major-mode-commands)
+  ("C-c M-x" . execute-extended-command))
+#+END_SRC
+
+*** Smart parens
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package smartparens-config
+  :ensure smartparens
+  :commands (smartparens-global-strict-mode)
+  :bind
+  ("C-M-a" . sp-beginning-of-sexp)
+  ("C-M-e" . sp-end-of-sexp)
+  :config
+  (setq sp-show-pair-from-inside t)
+  (smartparens-global-strict-mode)
+  (show-smartparens-global-mode))
+#+END_SRC
+
+*** Crux
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package crux
+  :bind
+  (:map prog-mode-map
+        ("C-a" . crux-move-beginning-of-line)))
+#+END_SRC
+
+*** Multiple cursors
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package multiple-cursors
+  :ensure t
+  :commands (mc/edit-lines mc/mark-all-like-this)
+  :init
+  (setq mc/list-file (concat my/emacs-cache "mc-lists.el"))
+  :bind
+  ("C-c m c" . mc/edit-lines)
+  ("C-c m a" . mc/mark-all-like-this)
+  ("M-<down>" . mc/mark-next-like-this)
+  ("M-<up>" . mc/mark-previous-like-this))
+#+END_SRC
+
+*** Org mode
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (ledger . t)
+   (sh .t)
+   ))
+
+(setq org-confirm-babel-evaluate nil)
+(setq org-src-window-setup 'current-window)
+#+END_SRC
+
+** Software development packages
+
+*** Web-mode
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package web-mode
+  :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.xml?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.vue?\\'" . web-mode))
+
+  (defun my-web-mode-hook ()
+    "Hooks for Web mode."
+    (setq indent-tabs-mode nil)
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-enable-current-element-highlight t)
+
+    (setq web-mode-style-padding 2)
+    (setq web-mode-script-padding 0))
+
+  (add-hook 'web-mode-hook 'my-web-mode-hook))
+#+END_SRC
+
+*** JS-mode
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package js2-mode
+  :config
+  (setq js2-basic-offset 2))
+#+END_SRC
