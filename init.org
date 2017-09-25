@@ -1,0 +1,88 @@
+#+TITLE: Denis Emacs configuration
+#+OPTIONS: toc:4 h:4
+#+STARTUP: showeverything
+
+* Configuration
+** About this file
+
+This file is compiled from [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua config]] with some parts borrowed from [[https://github.com/larstvei/dot-emacs/blob/master/init.el][here]].
+
+** Enabling org-mode for structuring .el configuration file
+
+(Taken from [[https://github.com/larstvei/dot-emacs/blob/master/init.org][here]])
+
+In your init.el, put the following:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(require 'org)
+(org-babel-load-file
+ (expand-file-name "init.org"
+                   user-emacs-directory))
+#+END_SRC
+
+There is no reason to track the =init.el= that is generated; by running the following command =git= will not bother tracking it:
+
+#+BEGIN_SRC sh :tangle no
+git update-index --assume-unchanged init.el
+#+END_SRC
+
+If one wishes to make changes to the repo-version of =init.el= start tracking again with:
+
+#+BEGIN_SRC sh :tangle no
+git update-index --no-assume-unchanged init.el
+#+END_SRC
+
+The =init.el= should (after the first run) mirror the source blocks in
+the =init.org=. We can use =C-c C-v t= to run =org-babel-tangle=, which
+extracts the code blocks from the current file into a source-specific
+file (in this case a =.el=-file).
+
+To avoid doing this each time a change is made we can add a function to
+the =after-save-hook= ensuring to always tangle and byte-compile the
+=org=-document after changes.
+
+#+BEGIN_SRC emacs-lisp
+(defun tangle-init ()
+  "If the current buffer is 'init.org' the code-blocks are
+tangled, and the tangled file is compiled."
+  (when (equal (buffer-file-name)
+               (expand-file-name (concat user-emacs-directory "init.org")))
+    ;; Avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+      (org-babel-tangle)
+      (byte-compile-file (concat user-emacs-directory "init.el")))))
+
+(add-hook 'after-save-hook 'tangle-init)
+#+END_SRC
+
+** Emacs initialization
+
+*** Add package sources
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+;; add MELPA, Org, and ELPY
+(require 'package)
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+#+END_SRC
+
+Use =M-x package-refresh-contents= to reload the list of packages
+after adding these for the first time.
+
+*** Use-package configuration
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(setq use-package-verbose t)
+(setq use-package-always-ensure t)
+
+(eval-when-compile
+  (require 'use-package))
+(require 'diminish)
+(require 'bind-key)
+#+END_SRC
