@@ -273,16 +273,14 @@ https://sam217pa.github.io/2016/08/30/how-to-make-your-own-spacemacs/
 *** Smart parens
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-(use-package smartparens-config
-  :ensure smartparens
-  :commands (smartparens-global-strict-mode)
-  :bind
-  ("C-M-a" . sp-beginning-of-sexp)
-  ("C-M-e" . sp-end-of-sexp)
+(use-package smartparens
   :config
   (setq sp-show-pair-from-inside t)
   (smartparens-global-strict-mode)
-  (show-smartparens-global-mode))
+  (show-smartparens-global-mode)
+  :bind
+  ("C-M-a" . sp-beginning-of-sexp)
+  ("C-M-e" . sp-end-of-sexp))
 #+END_SRC
 
 *** Crux
