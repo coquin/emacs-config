@@ -364,3 +364,17 @@ https://sam217pa.github.io/2016/08/30/how-to-make-your-own-spacemacs/
   :config
   (setq js2-basic-offset 2))
 #+END_SRC
+
+*** Clojure mode
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package clojure-mode
+  :config
+  (setq clojure-defun-style-default-indent t))
+#+END_SRC
+
+**** TODO make sure to check following configs:
+
++ https://github.com/tomjakubowski/.emacs.d/blob/master/init.el#L130
++ https://github.com/weavejester/dotfiles/blob/master/emacs.d/init.el#L332
++ https://github.com/sandhu/emacs.d/blob/master/config/114-clojure-config.el
