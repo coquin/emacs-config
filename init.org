@@ -139,6 +139,12 @@ No beeping, no visual bell
 (setq ring-bell-function 'ignore)
 #+END_SRC
 
+No scrollbars
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(scroll-bar-mode 0)
+#+END_SRC
+
 Show line numbers in prog-mode
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -150,6 +156,13 @@ Delete trailing whitespaces on save
 #+BEGIN_SRC emacs-lisp :tangle yes
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
+
+Highlight matching brackets
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(show-paren-mode 1)
+#+END_SRC
+
 
 **** Scrolling
 
@@ -163,8 +176,11 @@ Emacs has some awful scrolling by default. This gets rid of that.
 (setq scroll-preserve-screen-position t)
 (setq scroll-conservatively 101)
 (setq view-read-only t) ; open read only buffers in view-mode
-;; the defaults C-v and M-v scroll a full page, which is too much.
-;; rebind to a half page:
+#+END_SRC
+
+The defaults C-v and M-v scroll a full page, which is too much. Rebind to a half page:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
 (use-package view
   :bind
   ("C-v" . View-scroll-half-page-forward)
@@ -192,7 +208,7 @@ This provides a visual cue whenever Emacs scrolls so it’s easier to keep my pl
 *** Magit
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-(use-package magit ; for git
+(use-package magit
   :pin melpa-stable
   :bind
   ("C-x g" . magit-status)
