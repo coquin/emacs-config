@@ -289,7 +289,14 @@ https://sam217pa.github.io/2016/08/30/how-to-make-your-own-spacemacs/
 (use-package crux
   :bind
   (:map prog-mode-map
-        ("C-a" . crux-move-beginning-of-line)))
+        ("C-a" . crux-move-beginning-of-line)
+        ("C-S-<return>" . crux-smart-open-line-above)
+        ("S-<return>" . crux-smart-open-line)
+        ("C-c d" . crux-duplicate-current-line-or-region)
+        ("C-c r" . crux-rename-file-and-buffer)
+        ("C-^" . crux-top-join-line)
+        ("C-S-k" . crux-kill-whole-line)
+        ("C-<backspace>" . crux-kill-line-backwards)))
 #+END_SRC
 
 *** Multiple cursors
