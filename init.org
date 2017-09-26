@@ -328,6 +328,27 @@ https://sam217pa.github.io/2016/08/30/how-to-make-your-own-spacemacs/
 (setq org-src-window-setup 'current-window)
 #+END_SRC
 
+*** Company mode
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package company
+  :bind
+  (:map company-active-map
+        ("C-s" . company-search-candidates)
+        ("<tab>" . company-complete-common-or-cycle)
+        ("RET" . company-complete-selection)
+        ("C-n" . company-select-next)
+        ("C-p" . company-select-previous))
+  :init
+  (add-hook 'after-init-hook #'global-company-mode)
+  (add-to-list 'company-dabbrev-code-modes 'web-mode)
+  :config
+  (setq company-minimum-prefix-length 2)
+  (setq company-idle-delay 0.5)
+  (setq company-require-match nil)
+  (setq company-etags-everywhere '(web-mode js-mode js2-mode)))
+#+END_SRC
+
 ** Software development packages
 
 *** Web-mode
