@@ -251,7 +251,8 @@ https://sam217pa.github.io/2016/08/30/how-to-make-your-own-spacemacs/
 (use-package avy
   :ensure t
   :bind
-  ("C-M-g" . avy-goto-char-timer))
+  ("C-'" . avy-goto-char-timer)
+  ("C-M-g" . avy-goto-line))
 #+END_SRC
 
 *** Counsel
